@@ -1,24 +1,25 @@
-<head>
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-    crossorigin=""
-  />
-</head>
+<head> </head>
 <style>
-  #map {
-    height: 50%;
+  #map-browser {
+    height: 400px;
+    width: 400px;
+    top: 0;
+    right: 0;
+    z-index: 100;
+    position: absolute;
+  }
+  canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
   }
 </style>
-<!-- Make sure you put this AFTER Leaflet's CSS -->
 <body>
-  <div id="map"></div>
-  <input type="text" id="search" />
+  <map-browser id="map-browser"></map-browser>
+  <div id="pano"></div>
 </body>
-<script
-  src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
-  integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
-  crossorigin=""
-></script>
+<script src="https://maps.google.com/maps/api/js?sensor=false"></script>
+
 <script src="main.js" type="module"></script>
