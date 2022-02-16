@@ -20,19 +20,26 @@ import {
   BackSide,
   FrontSide,
   TextureLoader,
+  CubeRefractionMapping,
 } from "./third_party/three.module.js";
 import { OrbitControls } from "./third_party/OrbitControls.js";
 import { EquirectangularToCubemap } from "./EquirectangularToCubemap.js";
 
 const pano = document.querySelector("#pano");
 
+const progress = document.querySelector("#progress");
 window.addEventListener("map-selection", async (e) => {
+  progress.textContent = "Loading...";
   const loader = new GoogleStreetViewLoader();
+  loader.onProgress((p) => {
+    progress.textContent = `${p}`;
+  });
   const res = await loader.loadFromLocation(
     e.detail.latLng.lat,
     e.detail.latLng.lng,
     3
   );
+  progress.textContent = "Loaded...";
   // const res = await loader.load("NXt68MqxYRfZuEm2R-OQoA", 3);
   while (pano.firstChild) {
     pano.firstChild.remove();
@@ -52,6 +59,7 @@ window.addEventListener("map-selection", async (e) => {
   texture.wrapS = texture.wrapT = RepeatWrapping;
   cubemap.wrapS = cubemap.wrapT = RepeatWrapping;
   cubemap.offset.set(0.5, 0);
+  cubemap.mapping = CubeRefractionMapping;
   mesh.material.map = texture;
   mesh.material.needsUpdate = true;
 
@@ -118,17 +126,17 @@ const torus = new Mesh(
   // new IcosahedronBufferGeometry(0.05, 10),
   new MeshStandardMaterial({
     color: 0xffffff,
-    map: colorMap,
+    //map: colorMap,
     // emissive: 0xffffff,
     roughness: 0, //0.25,
-    metalness: 0,
+    metalness: 1,
     refractionRatio: 0.9,
-    roughnessMap,
+    reflectivity: 0.5,
+    // roughnessMap,
     normalMap,
-    metalnessMap,
+    // metalnessMap,
     side: BackSide,
-    refractionRatio: 0.9,
-    envMap: texture,
+    // envMap: texture,
   })
 );
 torus.rotation.x = Math.PI / 2;
