@@ -7,6 +7,7 @@ import {
   BackSide,
   Mesh,
   IcosahedronBufferGeometry,
+  CubeReflectionMapping,
 } from "./third_party/three.module.js";
 
 function EquirectangularToCubemap(renderer) {
@@ -32,6 +33,7 @@ EquirectangularToCubemap.prototype.convert = function (source, size) {
     generateMipmaps: true,
     minFilter: LinearMipmapLinearFilter,
   });
+  cubeRenderTarget.texture.mapping = CubeReflectionMapping;
 
   this.camera = new CubeCamera(1, 100000, cubeRenderTarget);
   this.material.map = source;
