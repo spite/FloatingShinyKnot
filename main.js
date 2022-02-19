@@ -4,26 +4,11 @@ import {
   WebGLRenderer,
   Scene,
   PerspectiveCamera,
-  MeshNormalMaterial,
   Mesh,
-  IcosahedronBufferGeometry,
-  MeshBasicMaterial,
   CanvasTexture,
-  DoubleSide,
   RepeatWrapping,
   TorusKnotBufferGeometry,
-  EquirectangularReflectionMapping,
   DirectionalLight,
-  MeshPhongMaterial,
-  MeshStandardMaterial,
-  EquirectangularRefractionMapping,
-  BackSide,
-  FrontSide,
-  TextureLoader,
-  CubeRefractionMapping,
-  BoxBufferGeometry,
-  Vector3,
-  CubeReflectionMapping,
 } from "./third_party/three.module.js";
 import { OrbitControls } from "./third_party/OrbitControls.js";
 import { EquirectangularToCubemap } from "./EquirectangularToCubemap.js";
@@ -96,27 +81,13 @@ texture.needsUpdate = true;
 const directLight = new DirectionalLight(0xffffff);
 scene.add(directLight);
 
-const loader = new TextureLoader();
-const roughnessMap = loader.load("./assets/Metal038_1K_Roughness.jpg");
-roughnessMap.repeat.set(10, 1);
-roughnessMap.wrapS = roughnessMap.wrapT = RepeatWrapping;
-const normalMap = loader.load("./assets/Metal038_1K_NormalGL.jpg");
-normalMap.repeat.set(10, 1);
-normalMap.wrapS = normalMap.wrapT = RepeatWrapping;
-const metalnessMap = loader.load("./assets/Metal038_1K_Metalness.jpg");
-metalnessMap.repeat.set(10, 1);
-metalnessMap.wrapS = metalnessMap.wrapT = RepeatWrapping;
-const colorMap = loader.load("./assets/Metal038_1K_Color.jpg");
-colorMap.repeat.set(10, 1);
-colorMap.wrapS = colorMap.wrapT = RepeatWrapping;
-
 const torus = new Mesh(
-  new TorusKnotBufferGeometry(0.05, 0.015, 200, 36),
+  // new TorusKnotBufferGeometry(0.05, 0.015, 200, 36),
+  new TorusKnotBufferGeometry(0.05, 0.015, 200, 36, 4, 2),
   // new IcosahedronBufferGeometry(0.05, 10),
-
   material
 );
-torus.rotation.x = Math.PI / 2;
+// torus.rotation.x = Math.PI / 2;
 // torus.geometry.scale(-1, 1, 1);
 scene.add(torus);
 
