@@ -89,7 +89,7 @@ vec4 biplanar( sampler2D sam, in vec3 p, in vec3 n, in float k )
                                vec2(dpdx[me.y],dpdx[me.z]),
                                vec2(dpdy[me.y],dpdy[me.z]) );
     
-    // blend factors
+    // blend fac  s
     vec2 w = vec2(n[ma.x],n[me.x]);
     // make local support
     w = clamp( (w-0.5773)/(1.0-0.5773), 0.0, 1.0 );
@@ -144,10 +144,10 @@ void main() {
                           tanZ * blend_weights.zzz; 
                           
 
-  float normalScale = 2.;
+  float normalScale = .5;
   vec3 normalTex = blendedNormal * 2.0 - 1.0;
   normalTex.xy *= normalScale;
-  //normalTex.y *= -1.;
+  normalTex.y *= -1.;
   normalTex = normalize( normalTex );
   mat3 tsb = mat3( normalize( blended_tangent ), normalize( cross( vNormal, blended_tangent ) ), normalize( vNormal ) );
   vec3 finalNormal = tsb * normalTex;
@@ -157,9 +157,9 @@ void main() {
   vec3 refr = normalize(refract(normalize(vMPosition.xyz - cameraPosition), fn, 0.9));
 
   float r = smoothstep(.2, .5, blendedRoughness.r) * 5.;
-  vec4 c1 = texture(envMap, refl, r);
-  vec4 c2 = texture(envMap, refr, 4.);
-  color = c2;// roughness;//vec4(1.,0.,1., 1.);
+  vec4 c1 = texture(envMap, refl, 0.);
+  vec4 c2 = texture(envMap, refr, 5.);
+  color = mix(c1, c2, blendedRoughness.r);// roughness;//vec4(1.,0.,1., 1.);
 }`;
 
 const loader = new TextureLoader();
