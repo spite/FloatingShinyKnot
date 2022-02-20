@@ -83,7 +83,7 @@ scene.add(directLight);
 
 const torus = new Mesh(
   // new TorusKnotBufferGeometry(0.05, 0.015, 200, 36),
-  new TorusKnotBufferGeometry(0.05, 0.015, 200, 36, 4, 2),
+  new TorusKnotBufferGeometry(0.05, 0.015, 400, 36, 4, 2),
   // new IcosahedronBufferGeometry(0.05, 10),
   material
 );
@@ -102,6 +102,7 @@ function resize() {
 window.addEventListener("resize", resize);
 
 function render() {
+  material.uniforms.time.value = performance.now() / 10000;
   renderer.render(scene, camera);
   renderer.setAnimationLoop(render);
 }
