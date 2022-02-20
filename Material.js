@@ -56,6 +56,7 @@ uniform samplerCube envMap;
 uniform sampler2D normalMap;
 uniform sampler2D roughnessMap;
 uniform vec3 cameraPosition;
+uniform float time;
 
 out vec4 color;
 
@@ -107,34 +108,34 @@ void main() {
   blend_weights = max( blend_weights, 0. );
   blend_weights /= ( blend_weights.x + blend_weights.y + blend_weights.z );
 
-  vec2 texScale = vec2(10.);
-  vec2 coord1 = vPosition.yz * texScale;
-  vec2 coord2 = vPosition.zx * texScale;
-  vec2 coord3 = vPosition.xy * texScale;
+  // vec2 texScale = vec2(10.);
+  // vec2 coord1 = vPosition.yz * texScale;
+  // vec2 coord2 = vPosition.zx * texScale;
+  // vec2 coord3 = vPosition.xy * texScale;
 
-  // vec4 col1 = texture( textureMap, coord1 );  
-  // vec4 col2 = texture( textureMap, coord2 );  
-  // vec4 col3 = texture( textureMap, coord3 ); 
+  // // vec4 col1 = texture( textureMap, coord1 );  
+  // // vec4 col2 = texture( textureMap, coord2 );  
+  // // vec4 col3 = texture( textureMap, coord3 ); 
 
-  vec4 roughness1 = texture( roughnessMap, coord1 );  
-  vec4 roughness2 = texture( roughnessMap, coord2 );  
-  vec4 roughness3 = texture( roughnessMap, coord3 ); 
+  // vec4 roughness1 = texture( roughnessMap, coord1 );  
+  // vec4 roughness2 = texture( roughnessMap, coord2 );  
+  // vec4 roughness3 = texture( roughnessMap, coord3 ); 
 
-  vec3 normal1 = texture( normalMap, coord1 ).rgb;  
-  vec3 normal2 = texture( normalMap, coord2 ).rgb;  
-  vec3 normal3 = texture( normalMap, coord3 ).rgb; 
+  // vec3 normal1 = texture( normalMap, coord1 ).rgb;  
+  // vec3 normal2 = texture( normalMap, coord2 ).rgb;  
+  // vec3 normal3 = texture( normalMap, coord3 ).rgb; 
 
-  // vec4 blended_color = col1 * blend_weights.xxxx +  
-  //                       col2 * blend_weights.yyyy +  
-  //                       col3 * blend_weights.zzzz; 
+  // // vec4 blended_color = col1 * blend_weights.xxxx +  
+  // //                       col2 * blend_weights.yyyy +  
+  // //                       col3 * blend_weights.zzzz; 
 
-  vec4 blendedRoughness = roughness1 * blend_weights.xxxx +  
-                          roughness2 * blend_weights.yyyy +  
-                          roughness3 * blend_weights.zzzz; 
+  // vec4 blendedRoughness = roughness1 * blend_weights.xxxx +  
+  //                         roughness2 * blend_weights.yyyy +  
+  //                         roughness3 * blend_weights.zzzz; 
 
-  vec3 blendedNormal = normal1 * blend_weights.xxx +  
-                      normal2 * blend_weights.yyy +  
-                      normal3 * blend_weights.zzz;
+  // vec3 blendedNormal = normal1 * blend_weights.xxx +  
+  //                     normal2 * blend_weights.yyy +  
+  //                     normal3 * blend_weights.zzz;
 
   vec3 tanX = vec3(  vNormal.x, -vNormal.z,  vNormal.y );
   vec3 tanY = vec3(  vNormal.z,  vNormal.y, -vNormal.x );
@@ -144,22 +145,28 @@ void main() {
                           tanZ * blend_weights.zzz; 
                           
 
-  float normalScale = .5;
-  vec3 normalTex = blendedNormal * 2.0 - 1.0;
+  vec2 uv = vUv * vec2(20.,1.)+ vec2(time,0.);
+
+  float normalScale = 2.;
+  vec3 normalTex = texture(normalMap, uv).rgb *2.0 - 1.0;//blendedNormal * 2.0 - 1.0;
   normalTex.xy *= normalScale;
-  normalTex.y *= -1.;
+  // normalTex.y *= -1.;
   normalTex = normalize( normalTex );
-  mat3 tsb = mat3( normalize( blended_tangent ), normalize( cross( vNormal, blended_tangent ) ), normalize( vNormal ) );
+  mat3 tsb = mat3( normalize( blended_tangent ) , normalize( cross( vNormal, blended_tangent ) ), normalize( vNormal ) );
   vec3 finalNormal = tsb * normalTex;
 
-  vec3 fn = normalize(nMat * finalNormal);
-  vec3 refl = normalize(reflect(normalize(vMPosition.xyz - cameraPosition), fn));
-  vec3 refr = normalize(refract(normalize(vMPosition.xyz - cameraPosition), fn, 0.9));
+  float roughness = texture(roughnessMap, uv).r;
+  float r = smoothstep(.2, .5, roughness) * 5.;
 
-  float r = smoothstep(.2, .5, blendedRoughness.r) * 5.;
+  vec3 fn = normalize(nMat * finalNormal);
+  vec3 t = normalize(vMPosition.xyz - cameraPosition);
+  vec3 refl = normalize(reflect(t, fn));
+  vec3 refr = normalize(refract(t, fn, .9));
+
+  vec4 c = texture(envMap, vNormal, 5.);
   vec4 c1 = texture(envMap, refl, 0.);
-  vec4 c2 = texture(envMap, refr, 5.);
-  color = mix(c1, c2, blendedRoughness.r);// roughness;//vec4(1.,0.,1., 1.);
+  vec4 c2 = texture(envMap, refr, 0.);
+  color = c1;//mix(c, c2, .9);//c1;//mix(c1, c2, roughness);// roughness;//vec4(1.,0.,1., 1.);
 }`;
 
 const loader = new TextureLoader();
@@ -177,7 +184,9 @@ const material = new RawShaderMaterial({
     envMap: { value: null },
     roughnessMap: { value: roughnessMap },
     normalMap: { value: normalMap },
+    time: { value: 0 },
   },
+  // wireframe: true,
   vertexShader,
   fragmentShader,
   glslVersion: GLSL3,
