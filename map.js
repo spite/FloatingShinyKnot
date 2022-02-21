@@ -80,17 +80,26 @@ class MapBrowser extends LitElement {
   }
 
   onMapClick(e) {
-    this.addMarker(e.latlng);
+    this.addMarker(e.latlng.lat, e.latlng.lng);
   }
 
-  addMarker(latLng) {
+  moveTo(lat, lng) {
+    this.removeMarker();
+    this.marker = L.marker([lat, lng]).addTo(this.map);
+    this.map.panTo([lat, lng]);
+  }
+
+  removeMarker() {
     if (this.marker) {
       this.map.removeLayer(this.marker);
     }
-    this.marker = L.marker(latLng).addTo(this.map);
+  }
+
+  addMarker(lat, lng) {
+    this.moveTo(lat, lng);
     const e = new CustomEvent("map-selection", {
       bubbles: true,
-      detail: { latLng },
+      detail: { latLng: { lat, lng } },
     });
     this.dispatchEvent(e);
   }
@@ -105,7 +114,19 @@ class MapBrowser extends LitElement {
       [parseFloat(bb[0]), parseFloat(bb[2])],
       [parseFloat(bb[1]), parseFloat(bb[3])],
     ]);
-    this.addMarker([parseFloat(city.lat), parseFloat(city.lon)]);
+    this.addMarker(parseFloat(city.lat), parseFloat(city.lon));
+  }
+
+  onLocation() {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        this.addMarker(pos.coords.latitude, pos.coords.longitude);
+      },
+      (e) => {
+        debugger;
+      },
+      { enableHighAccuracy: true }
+    );
   }
 
   render() {
@@ -122,10 +143,11 @@ class MapBrowser extends LitElement {
           right: 0;
           bottom: 2em;
         }
-        input {
+        #tools {
           position: absolute;
           bottom: 0;
           left: 0;
+          right: 0;
         }
       </style>
       <link
@@ -135,7 +157,11 @@ class MapBrowser extends LitElement {
         crossorigin=""
       />
       <div id="map"></div>
-      <input type="text" id="search" @change=${this.onChange} />
+      <div id="tools">
+        <input type="text" id="search" @change=${this.onChange} />
+        <button @click=${this.onLocation}>My location</button>
+        <div></div>
+      </div>
     `;
   }
 }
