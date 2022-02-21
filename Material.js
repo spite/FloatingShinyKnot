@@ -26,6 +26,7 @@ out vec4 vMPosition;
 out vec3 vReflect;
 out vec3 vRefract;
 out mat3 nMat;
+out vec3 vViewPosition;
 
 void main() {
   vUv = uv;
@@ -35,9 +36,11 @@ void main() {
   vMPosition = modelMatrix * vec4( position, 1.0 );
   nMat = mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz );
   vWNormal = normalize( mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz ) * normal );
+  vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+  vViewPosition = -mvPosition.xyz;
 
   vPosition = position;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+  gl_Position = projectionMatrix * mvPosition;
 }`;
 
 const fragmentShader = `precision highp float;
@@ -51,12 +54,14 @@ in vec3 vPosition;
 in vec3 vReflect;
 in vec3 vRefract;
 in mat3 nMat;
+in vec3 vViewPosition;
 
 uniform samplerCube envMap;
 uniform sampler2D normalMap;
 uniform sampler2D roughnessMap;
 uniform vec3 cameraPosition;
 uniform float time;
+uniform mat3 normalMatrix;
 
 out vec4 color;
 
@@ -147,7 +152,7 @@ void main() {
 
   vec2 uv = vUv * vec2(20.,1.)+ vec2(time,0.);
 
-  float normalScale = 2.;
+  float normalScale = 1.;
   vec3 normalTex = texture(normalMap, uv).rgb *2.0 - 1.0;//blendedNormal * 2.0 - 1.0;
   normalTex.xy *= normalScale;
   // normalTex.y *= -1.;
@@ -163,10 +168,14 @@ void main() {
   vec3 refl = normalize(reflect(t, fn));
   vec3 refr = normalize(refract(t, fn, .9));
 
+  vec3 e = normalize( vViewPosition );
+  float rim = 1. - pow(abs(dot(e, normalMatrix * finalNormal)),2.);
+
   vec4 c = texture(envMap, vNormal, 5.);
   vec4 c1 = texture(envMap, refl, 0.);
-  vec4 c2 = texture(envMap, refr, 0.);
-  color = c1;//mix(c, c2, .9);//c1;//mix(c1, c2, roughness);// roughness;//vec4(1.,0.,1., 1.);
+  vec4 c2 = texture(envMap, refr, 3.);
+  color = c2;//mix(c, c2, .9);//c1;//mix(c1, c2, roughness);// roughness;//vec4(1.,0.,1., 1.);
+  color = mix(c2, c1, rim);
 }`;
 
 const loader = new TextureLoader();
