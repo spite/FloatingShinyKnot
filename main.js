@@ -1,5 +1,5 @@
 import "./map.js";
-import { GoogleStreetViewLoader } from "./src/PanomNom.js";
+import { GoogleStreetViewLoader, getIdByLocation } from "./src/PanomNom.js";
 import {
   WebGLRenderer,
   Scene,
@@ -15,6 +15,7 @@ import { EquirectangularToCubemap } from "./EquirectangularToCubemap.js";
 import { material } from "./material.js";
 
 const pano = document.querySelector("#pano");
+const map = document.querySelector("#map-browser");
 
 const progress = document.querySelector("#progress");
 window.addEventListener("map-selection", async (e) => {
@@ -23,23 +24,31 @@ window.addEventListener("map-selection", async (e) => {
   loader.onProgress((p) => {
     progress.textContent = `${p}`;
   });
-  const res = await loader.loadFromLocation(
-    e.detail.latLng.lat,
-    e.detail.latLng.lng,
-    3
-  );
-  progress.textContent = "Loaded...";
-  // const res = await loader.load("NXt68MqxYRfZuEm2R-OQoA", 3);
-  while (pano.firstChild) {
-    pano.firstChild.remove();
+
+  const lat = e.detail.latLng.lat;
+  const lon = e.detail.latLng.lng;
+  const zoom = 3;
+  let metadata;
+
+  try {
+    metadata = await getIdByLocation(lat, lon);
+  } catch (e) {
+    console.log(e);
+    progress.textContent = e;
+    return;
   }
 
-  // const canvas = document.createElement("canvas");
-  // canvas.width = 512;
-  // canvas.height = 512;
-  // const ctx = canvas.getContext("2d");
-  // ctx.fillStyle = "#00ff00";
-  // ctx.fillRect(0, 0, 512, 512);
+  const res = await loader.load(metadata.data.location.pano, zoom);
+  map.moveTo(
+    metadata.data.location.latLng.lat(),
+    metadata.data.location.latLng.lng()
+  );
+
+  progress.textContent = "Loaded.";
+  // const res = await loader.load("NXt68MqxYRfZuEm2R-OQoA", 3);
+  // while (pano.firstChild) {
+  //   pano.firstChild.remove();
+  // }
 
   const texture = new CanvasTexture(loader.canvas);
   const cubemap = equiToCube.convert(texture, 1024);
@@ -83,12 +92,10 @@ scene.add(directLight);
 
 const torus = new Mesh(
   // new TorusKnotBufferGeometry(0.05, 0.015, 200, 36),
-  new TorusKnotBufferGeometry(0.05, 0.015, 400, 36, 4, 2),
+  new TorusKnotBufferGeometry(0.05, 0.015, 400, 36, 1, 2),
   // new IcosahedronBufferGeometry(0.05, 10),
   material
 );
-// torus.rotation.x = Math.PI / 2;
-// torus.geometry.scale(-1, 1, 1);
 scene.add(torus);
 
 function resize() {
@@ -101,8 +108,22 @@ function resize() {
 
 window.addEventListener("resize", resize);
 
+let running = true;
+
+window.addEventListener("keydown", (e) => {
+  if (e.code === "Space") {
+    running = !running;
+  }
+});
+
 function render() {
-  material.uniforms.time.value = performance.now() / 10000;
+  const t = performance.now() / 10000;
+  if (running) {
+    torus.rotation.x = 0.49 * t;
+    torus.rotation.y = 0.5 * t;
+    torus.rotation.z = 0.51 * t;
+    material.uniforms.time.value = t;
+  }
   renderer.render(scene, camera);
   renderer.setAnimationLoop(render);
 }
