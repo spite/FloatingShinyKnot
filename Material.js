@@ -150,7 +150,7 @@ void main() {
                           tanZ * blend_weights.zzz; 
                           
 
-  vec2 uv = vUv * vec2(20.,1.)+ vec2(time,0.);
+  vec2 uv = vUv * vec2(10.,1.)+ vec2(time,0.);
 
   float normalScale = 1.;
   vec3 normalTex = texture(normalMap, uv).rgb *2.0 - 1.0;//blendedNormal * 2.0 - 1.0;
