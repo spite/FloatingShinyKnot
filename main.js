@@ -14,51 +14,50 @@ import { OrbitControls } from "./third_party/OrbitControls.js";
 import { EquirectangularToCubemap } from "./EquirectangularToCubemap.js";
 import { material } from "./material.js";
 
-const pano = document.querySelector("#pano");
 const map = document.querySelector("#map-browser");
-
 const progress = document.querySelector("#progress");
-window.addEventListener("map-selection", async (e) => {
+
+async function load(lat, lng) {
   progress.textContent = "Loading...";
   const loader = new GoogleStreetViewLoader();
   loader.onProgress((p) => {
     progress.textContent = `${p}`;
   });
 
-  const lat = e.detail.latLng.lat;
-  const lon = e.detail.latLng.lng;
   const zoom = 3;
   let metadata;
 
   try {
-    metadata = await getIdByLocation(lat, lon);
+    metadata = await getIdByLocation(lat, lng);
   } catch (e) {
     console.log(e);
     progress.textContent = e;
     return;
   }
 
-  const res = await loader.load(metadata.data.location.pano, zoom);
   map.moveTo(
     metadata.data.location.latLng.lat(),
     metadata.data.location.latLng.lng()
   );
+  window.location.hash = `${metadata.data.location.latLng.lat()},${metadata.data.location.latLng.lng()}`;
+  const res = await loader.load(metadata.data.location.pano, zoom);
 
   progress.textContent = "Loaded.";
-  // const res = await loader.load("NXt68MqxYRfZuEm2R-OQoA", 3);
-  // while (pano.firstChild) {
-  //   pano.firstChild.remove();
-  // }
 
   const texture = new CanvasTexture(loader.canvas);
   const cubemap = equiToCube.convert(texture, 1024);
   scene.background = cubemap;
-  // texture.mapping = EquirectangularReflectionMapping;
   texture.wrapS = texture.wrapT = RepeatWrapping;
   cubemap.wrapS = cubemap.wrapT = RepeatWrapping;
   cubemap.offset.set(0.5, 0);
 
   torus.material.uniforms.envMap.value = cubemap;
+}
+
+window.addEventListener("map-selection", async (e) => {
+  const lat = e.detail.latLng.lat;
+  const lng = e.detail.latLng.lng;
+  await load(lat, lng);
 });
 
 const renderer = new WebGLRenderer({
@@ -127,6 +126,9 @@ function render() {
   renderer.render(scene, camera);
   renderer.setAnimationLoop(render);
 }
+
+const [lat, lng] = window.location.hash.substring(1).split(",");
+load(parseFloat(lat), parseFloat(lng));
 
 resize();
 render();
