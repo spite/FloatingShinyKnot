@@ -91,7 +91,7 @@ scene.add(directLight);
 
 const torus = new Mesh(
   // new TorusKnotBufferGeometry(0.05, 0.015, 200, 36),
-  new TorusKnotBufferGeometry(0.05, 0.015, 400, 36, 1, 2),
+  new TorusKnotBufferGeometry(0.05, 0.015, 400, 36, 3, 2),
   // new IcosahedronBufferGeometry(0.05, 10),
   material
 );
@@ -127,8 +127,12 @@ function render() {
   renderer.setAnimationLoop(render);
 }
 
-const [lat, lng] = window.location.hash.substring(1).split(",");
-load(parseFloat(lat), parseFloat(lng));
+async function init() {
+  await map.ready;
+  const [lat, lng] = window.location.hash.substring(1).split(",");
+  load(parseFloat(lat), parseFloat(lng));
+  render();
+}
 
 resize();
-render();
+init();
