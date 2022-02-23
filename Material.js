@@ -150,12 +150,12 @@ void main() {
                           tanZ * blend_weights.zzz; 
                           
 
-  vec2 uv = vUv * vec2(10.,1.)+ vec2(time,0.);
+  vec2 uv = vUv * vec2(20.,1.)+ vec2(time,0.);
 
   float normalScale = 1.;
   vec3 normalTex = texture(normalMap, uv).rgb *2.0 - 1.0;//blendedNormal * 2.0 - 1.0;
   normalTex.xy *= normalScale;
-  // normalTex.y *= -1.;
+  normalTex.y *= -1.;
   normalTex = normalize( normalTex );
   mat3 tsb = mat3( normalize( blended_tangent ) , normalize( cross( vNormal, blended_tangent ) ), normalize( vNormal ) );
   vec3 finalNormal = tsb * normalTex;
@@ -169,13 +169,13 @@ void main() {
   vec3 refr = normalize(refract(t, fn, .9));
 
   vec3 e = normalize( vViewPosition );
-  float rim = 1. - pow(abs(dot(e, normalMatrix * finalNormal)),2.);
+  float rim = 1. - pow(abs(dot(e, normalMatrix * finalNormal)), 1.);
 
   vec4 c = texture(envMap, vNormal, 5.);
   vec4 c1 = texture(envMap, refl, 0.);
   vec4 c2 = texture(envMap, refr, 3.);
   color = c2;//mix(c, c2, .9);//c1;//mix(c1, c2, roughness);// roughness;//vec4(1.,0.,1., 1.);
-  color = mix(c2, c1, rim);
+  color = c1 * vec4(vec3(rim), 1.);//mix(c2, c1, rim);
 }`;
 
 const loader = new TextureLoader();
