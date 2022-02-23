@@ -16,6 +16,10 @@ class MapBrowser extends LitElement {
   constructor() {
     super();
     this.marker = null;
+    this.onReady = null;
+    this.ready = new Promise((resolve, reject) => {
+      this.onReady = resolve;
+    });
   }
 
   async loadResources() {
@@ -59,6 +63,7 @@ class MapBrowser extends LitElement {
 
   async firstUpdated() {
     await this.loadResources();
+    this.onReady();
     const mapDiv = this.shadowRoot.querySelector("#map");
     this.map = L.map(mapDiv).setView([51.505, -0.09], 13);
 
