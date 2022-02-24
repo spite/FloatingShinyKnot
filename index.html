@@ -21,9 +21,19 @@
     top: 0;
     z-index: 100;
   }
+  #tools {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 1em;
+    z-index: 10;
+  }
 </style>
 <body>
   <map-browser id="map-browser"></map-browser>
+  <div id="tools">
+    <button id="randomBtn">Random location</button>
+  </div>
   <div id="pano"></div>
   <div id="progress"></div>
 </body>
