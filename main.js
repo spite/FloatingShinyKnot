@@ -1,4 +1,5 @@
 import "./map.js";
+import "./progress.js";
 import { GoogleStreetViewLoader, getIdByLocation } from "./src/PanomNom.js";
 import {
   WebGLRenderer,
@@ -15,13 +16,16 @@ import { EquirectangularToCubemap } from "./EquirectangularToCubemap.js";
 import { material } from "./material.js";
 
 const map = document.querySelector("#map-browser");
-const progress = document.querySelector("#progress");
+const progress = document.querySelector("progress-bar");
 
 async function load(lat, lng) {
-  progress.textContent = "Loading...";
+  // progress.textContent = "Loading...";
+  progress.reset();
+  progress.show();
+
   const loader = new GoogleStreetViewLoader();
   loader.onProgress((p) => {
-    progress.textContent = `${p}`;
+    progress.progress = p;
   });
 
   const zoom = 3;
@@ -31,7 +35,7 @@ async function load(lat, lng) {
     metadata = await getIdByLocation(lat, lng);
   } catch (e) {
     console.log(e);
-    progress.textContent = e;
+    // progress.textContent = e;
     return;
   }
 
@@ -42,7 +46,8 @@ async function load(lat, lng) {
   window.location.hash = `${metadata.data.location.latLng.lat()},${metadata.data.location.latLng.lng()}`;
   const res = await loader.load(metadata.data.location.pano, zoom);
 
-  progress.textContent = "Loaded.";
+  // progress.textContent = "Loaded.";
+  progress.hide();
 
   const texture = new CanvasTexture(loader.canvas);
   const cubemap = equiToCube.convert(texture, 1024);
