@@ -3,6 +3,8 @@ import {
   RawShaderMaterial,
   TextureLoader,
   RepeatWrapping,
+  LinearFilter,
+  LinearMipmapLinearFilter,
 } from "./third_party/three.module.js";
 
 const vertexShader = `precision highp float;
@@ -10,6 +12,7 @@ const vertexShader = `precision highp float;
 in vec3 position;
 in vec3 normal;
 in vec2 uv;
+in vec3 tangent;
 
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
@@ -27,10 +30,12 @@ out vec3 vReflect;
 out vec3 vRefract;
 out mat3 nMat;
 out vec3 vViewPosition;
+out vec3 vTangent;
 
 void main() {
   vUv = uv;
   vNormal = normal;
+  vTangent = tangent;
   vMNormal = normalMatrix * normal;
 
   vMPosition = modelMatrix * vec4( position, 1.0 );
@@ -55,6 +60,7 @@ in vec3 vReflect;
 in vec3 vRefract;
 in mat3 nMat;
 in vec3 vViewPosition;
+in vec3 vTangent;
 
 uniform samplerCube envMap;
 uniform sampler2D normalMap;
@@ -148,20 +154,22 @@ void main() {
   vec3 blended_tangent = tanX * blend_weights.xxx +  
                           tanY * blend_weights.yyy +  
                           tanZ * blend_weights.zzz; 
+  // blended_tangent = normalize(vTangent);
                           
 
-  vec2 uv = vUv * vec2(20.,1.)+ vec2(time,0.);
+  vec2 uv = vUv * vec2(1.,1.)+ vec2(time,0.);
+  float bias = 1.;
 
   float normalScale = 1.;
-  vec3 normalTex = texture(normalMap, uv).rgb *2.0 - 1.0;//blendedNormal * 2.0 - 1.0;
+  vec3 normalTex = texture(normalMap, uv, bias).rgb *2.0 - 1.0;//blendedNormal * 2.0 - 1.0;
   normalTex.xy *= normalScale;
   normalTex.y *= -1.;
   normalTex = normalize( normalTex );
   mat3 tsb = mat3( normalize( blended_tangent ) , normalize( cross( vNormal, blended_tangent ) ), normalize( vNormal ) );
   vec3 finalNormal = tsb * normalTex;
 
-  float roughness = texture(roughnessMap, uv).r;
-  float r = smoothstep(.2, .5, roughness) * 5.;
+  float roughness = texture(roughnessMap, uv, bias).r;
+  float r = 1.-roughness;//smoothstep(.2, .5, roughness) * 2.;
 
   vec3 fn = normalize(nMat * finalNormal);
   vec3 t = normalize(vMPosition.xyz - cameraPosition);
@@ -172,15 +180,19 @@ void main() {
   float rim = 1. - pow(abs(dot(e, normalMatrix * finalNormal)), 1.);
 
   vec4 c = texture(envMap, vNormal, 5.);
-  vec4 c1 = texture(envMap, refl, 0.);
-  vec4 c2 = texture(envMap, refr, 3.);
-  color = c2;//mix(c, c2, .9);//c1;//mix(c1, c2, roughness);// roughness;//vec4(1.,0.,1., 1.);
-  color = c1 * vec4(vec3(rim), 1.);//mix(c2, c1, rim);
+  vec4 c1 = texture(envMap, refl, r);
+  vec4 c2 = texture(envMap, refr, 5.);
+  color = c1;
+  // color = c2;
+  //mix(c, c2, .9);//c1;//
+  // color = mix(c1, c2, roughness);// roughness;//vec4(1.,0.,1., 1.);
+  color = .1 * c +  c1 * vec4(vec3(rim), 1.);
+  // color = mix(c2, c1, rim);
 }`;
 
 const loader = new TextureLoader();
 
-const roughnessMap = loader.load("./assets/Wavy_Water - Color Map.png");
+const roughnessMap = loader.load("./assets/Wavy_Water - Specular.png");
 roughnessMap.repeat.set(1, 1);
 roughnessMap.wrapS = roughnessMap.wrapT = RepeatWrapping;
 
