@@ -1,16 +1,17 @@
 import { LitElement, html } from "https://unpkg.com/lit?module";
 
-/* <link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-  integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-  crossorigin=""
-/>
-<script
-  src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
-  integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
-  crossorigin=""
-></script> */
+const locations = [
+  { lat: 51.50700703827454, lng: -0.12791916931155356 },
+  { lat: 32.6144404, lng: -108.9852017 },
+  { lat: 39.36382677360614, lng: 8.431220278759724 },
+  { lat: 59.30571937680209, lng: 4.879402148657164 },
+  { lat: 28.240385123352873, lng: -16.629988706884774 },
+  { lat: 50.09072314148827, lng: 14.393133454556278 },
+  { lat: 41.413416092316275, lng: 2.1531126527786455 },
+  { lat: 35.69143938066447, lng: 139.695139627539 },
+  { lat: 35.67120372775569, lng: 139.77167914398797 },
+  { lat: 54.552083679428065, lng: -3.297380963134742 },
+];
 
 class MapBrowser extends LitElement {
   constructor() {
@@ -134,25 +135,72 @@ class MapBrowser extends LitElement {
     );
   }
 
+  randomLocation() {
+    const location = locations[Math.floor(Math.random() * locations.length)];
+    this.addMarker(location.lat, location.lng);
+  }
+
   render() {
     return html`
       <style>
         :host {
           display: block;
           position: relative;
+          font: inherit;
         }
         #map {
           position: absolute;
           left: 0;
           top: 0;
           right: 0;
-          bottom: 2em;
+          bottom: 4em;
         }
         #tools {
           position: absolute;
           bottom: 0;
           left: 0;
           right: 0;
+          display: flex;
+          flex-direction: row;
+        }
+        .btn,
+        .btn:link,
+        .btn:visited {
+          white-space: nowrap;
+          border-radius: 0.25em;
+          border-style: solid;
+          border-width: 1px;
+          color: #111;
+          display: inline-block;
+          margin-bottom: 0.5em;
+          padding: 0.75em 1.25em;
+          text-decoration: none;
+          -webkit-transition: color 0.4s, background-color 0.4s, border 0.4s;
+          transition: color 0.4s, background-color 0.4s, border 0.4s;
+        }
+
+        .btn:hover,
+        .btn:focus {
+          color: #7fdbff;
+          border: 1px solid #7fdbff;
+          -webkit-transition: background-color 0.3s, color 0.3s, border 0.3s;
+          transition: background-color 0.3s, color 0.3s, border 0.3s;
+        }
+
+        .btn:active {
+          color: #0074d9;
+          border: 1px solid #0074d9;
+          -webkit-transition: background-color 0.3s, color 0.3s, border 0.3s;
+          transition: background-color 0.3s, color 0.3s, border 0.3s;
+        }
+        input {
+          padding: 0.75em 0.5em;
+          border: 1px solid #111;
+          outline: none;
+          border-radius: 0.25em;
+          margin-bottom: 0.5em;
+          flex: 1;
+          margin-right: 0.5em;
         }
       </style>
       <link
@@ -163,8 +211,16 @@ class MapBrowser extends LitElement {
       />
       <div id="map"></div>
       <div id="tools">
-        <input type="text" id="search" @change=${this.onChange} />
-        <button @click=${this.onLocation}>My location</button>
+        <input
+          placeholder="Search..."
+          type="text"
+          id="search"
+          @change=${this.onChange}
+        />
+        <button class="btn" @click=${this.onLocation}>My location</button>
+        <button class="btn" @click=${this.randomLocation}>
+          Random location
+        </button>
         <div></div>
       </div>
     `;
