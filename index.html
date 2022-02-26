@@ -1,8 +1,17 @@
 <head> </head>
 <style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    font-size: 13px;
+    font-family: sans-serif;
+  }
   #map-browser {
     height: 400px;
-    width: 400px;
+    width: 500px;
     top: 0;
     right: 0;
     z-index: 100;
@@ -31,9 +40,6 @@
 </style>
 <body>
   <map-browser id="map-browser"></map-browser>
-  <div id="tools">
-    <button id="randomBtn">Random location</button>
-  </div>
   <div id="pano"></div>
   <div id="progress"></div>
   <progress-bar></progress-bar>
