@@ -40,7 +40,7 @@ class ProgressBar extends LitElement {
           z-index: 100;
         }
         #bar {
-          width: 50%;
+          width: min(1000px, calc(100% - 40px));
           height: 40px;
           background-color: black;
           border-radius: 3px;
