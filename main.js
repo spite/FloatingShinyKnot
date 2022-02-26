@@ -34,6 +34,7 @@ async function load(lat, lng) {
   try {
     metadata = await getIdByLocation(lat, lng);
   } catch (e) {
+    progress.hide();
     console.log(e);
     // progress.textContent = e;
     return;
@@ -134,37 +135,13 @@ function render() {
   renderer.setAnimationLoop(render);
 }
 
-const locations = [
-  { lat: 51.50700703827454, lng: -0.12791916931155356 },
-  { lat: 32.6144404, lng: -108.9852017 },
-  { lat: 39.36382677360614, lng: 8.431220278759724 },
-  { lat: 59.30571937680209, lng: 4.879402148657164 },
-  { lat: 28.240385123352873, lng: -16.629988706884774 },
-  { lat: 50.09072314148827, lng: 14.393133454556278 },
-  { lat: 41.413416092316275, lng: 2.1531126527786455 },
-  { lat: 35.69143938066447, lng: 139.695139627539 },
-  { lat: 35.67120372775569, lng: 139.77167914398797 },
-  { lat: 54.552083679428065, lng: -3.297380963134742 },
-];
-
-function randomLocation() {
-  const location = locations[Math.floor(Math.random() * locations.length)];
-  return location;
-}
-
-document.querySelector("#randomBtn").addEventListener("click", async (e) => {
-  const location = randomLocation();
-  await load(location.lat, location.lng);
-});
-
 async function init() {
   await map.ready;
   const [lat, lng] = window.location.hash.substring(1).split(",");
   if (lat && lng) {
     await load(parseFloat(lat), parseFloat(lng));
   } else {
-    const location = randomLocation();
-    await load(location.lat, location.lng);
+    map.randomLocation();
   }
   render();
 }
