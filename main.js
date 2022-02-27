@@ -15,6 +15,9 @@ import {
 import { OrbitControls } from "./third_party/OrbitControls.js";
 import { EquirectangularToCubemap } from "./EquirectangularToCubemap.js";
 import { material } from "./material.js";
+import { twixt } from "./twixt.js";
+
+const speed = twixt.create("speed", 1);
 
 const map = document.querySelector("#map-browser");
 const progress = document.querySelector("progress-bar");
@@ -126,18 +129,31 @@ let running = true;
 window.addEventListener("keydown", (e) => {
   if (e.code === "Space") {
     running = !running;
+    if (running) {
+      speed.to(1, 500, "OutQuint");
+    } else {
+      speed.to(0, 500, "OutQuint");
+    }
   }
 });
 
+let time = 0;
+let prevTime = performance.now();
+
 function render() {
   controls.update();
-  const t = performance.now() / 10000;
-  if (running) {
-    torus.rotation.x = 0.49 * t;
-    torus.rotation.y = 0.5 * t;
-    torus.rotation.z = 0.51 * t;
-    material.uniforms.time.value = t;
-  }
+  const now = performance.now();
+  time += (now - prevTime) * speed.value;
+  prevTime = now;
+
+  // if (running) {
+  const t = time / 10000;
+  torus.rotation.x = 0.49 * t;
+  torus.rotation.y = 0.5 * t;
+  torus.rotation.z = 0.51 * t;
+  material.uniforms.time.value = t;
+  // }
+
   renderer.render(scene, camera);
   renderer.setAnimationLoop(render);
 }
