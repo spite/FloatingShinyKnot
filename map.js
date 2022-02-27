@@ -1,4 +1,5 @@
 import { LitElement, html } from "https://unpkg.com/lit?module";
+import "./button.js";
 
 const locations = [
   { lat: 51.50700703827454, lng: -0.12791916931155356 },
@@ -163,36 +164,6 @@ class MapBrowser extends LitElement {
           display: flex;
           flex-direction: row;
         }
-        .btn,
-        .btn:link,
-        .btn:visited {
-          white-space: nowrap;
-          border-radius: 0.25em;
-          border-style: solid;
-          border-width: 1px;
-          color: #111;
-          display: inline-block;
-          margin-bottom: 0.5em;
-          padding: 0.75em 1.25em;
-          text-decoration: none;
-          -webkit-transition: color 0.4s, background-color 0.4s, border 0.4s;
-          transition: color 0.4s, background-color 0.4s, border 0.4s;
-        }
-
-        .btn:hover,
-        .btn:focus {
-          color: #7fdbff;
-          border: 1px solid #7fdbff;
-          -webkit-transition: background-color 0.3s, color 0.3s, border 0.3s;
-          transition: background-color 0.3s, color 0.3s, border 0.3s;
-        }
-
-        .btn:active {
-          color: #0074d9;
-          border: 1px solid #0074d9;
-          -webkit-transition: background-color 0.3s, color 0.3s, border 0.3s;
-          transition: background-color 0.3s, color 0.3s, border 0.3s;
-        }
         input {
           padding: 0.75em 0.5em;
           border: 1px solid #111;
@@ -217,10 +188,10 @@ class MapBrowser extends LitElement {
           id="search"
           @change=${this.onChange}
         />
-        <button class="btn" @click=${this.onLocation}>My location</button>
-        <button class="btn" @click=${this.randomLocation}>
+        <x-button class="btn" @click=${this.onLocation}>My location</x-button>
+        <x-button class="btn" @click=${this.randomLocation}>
           Random location
-        </button>
+        </x-button>
         <div></div>
       </div>
     `;
