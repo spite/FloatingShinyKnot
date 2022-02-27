@@ -1,5 +1,6 @@
 import "./map.js";
 import "./progress.js";
+import "./snackbar.js";
 import { GoogleStreetViewLoader, getIdByLocation } from "./src/PanomNom.js";
 import {
   WebGLRenderer,
@@ -17,6 +18,7 @@ import { material } from "./material.js";
 
 const map = document.querySelector("#map-browser");
 const progress = document.querySelector("progress-bar");
+const snackbar = document.querySelector("snack-bar");
 
 async function load(lat, lng) {
   // progress.textContent = "Loading...";
@@ -36,6 +38,11 @@ async function load(lat, lng) {
   } catch (e) {
     progress.hide();
     console.log(e);
+    if (e.code === "ZERO_RESULTS") {
+      snackbar.error(
+        "There are no panoramas available in the selected location."
+      );
+    }
     // progress.textContent = e;
     return;
   }
