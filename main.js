@@ -11,11 +11,17 @@ import {
   RepeatWrapping,
   TorusKnotBufferGeometry,
   DirectionalLight,
+  IcosahedronBufferGeometry,
+  BoxBufferGeometry,
+  MeshBasicMaterial,
+  BackSide,
+  DoubleSide,
 } from "./third_party/three.module.js";
 import { OrbitControls } from "./third_party/OrbitControls.js";
 import { EquirectangularToCubemap } from "./EquirectangularToCubemap.js";
 import { material } from "./material.js";
 import { twixt } from "./twixt.js";
+import { material as backdropMaterial } from "./BackdropMaterial.js";
 
 const speed = twixt.create("speed", 1);
 
@@ -25,6 +31,7 @@ const snackbar = document.querySelector("snack-bar");
 
 async function load(lat, lng) {
   // progress.textContent = "Loading...";
+  snackbar.hide();
   progress.reset();
   progress.show();
 
@@ -62,12 +69,13 @@ async function load(lat, lng) {
 
   const texture = new CanvasTexture(loader.canvas);
   const cubemap = equiToCube.convert(texture, 1024);
-  scene.background = cubemap;
   texture.wrapS = texture.wrapT = RepeatWrapping;
   cubemap.wrapS = cubemap.wrapT = RepeatWrapping;
   cubemap.offset.set(0.5, 0);
 
-  torus.material.uniforms.envMap.value = cubemap;
+  torus.material.uniforms.envMap.value = texture;
+  backdropMaterial.uniforms.envMap.value = texture;
+  // backdrop.material.map = texture;
 }
 
 window.addEventListener("map-selection", async (e) => {
@@ -106,9 +114,19 @@ texture.needsUpdate = true;
 const directLight = new DirectionalLight(0xffffff);
 scene.add(directLight);
 
+const backdrop = new Mesh(
+  // new BoxBufferGeometry(10, 10, 10),
+  new IcosahedronBufferGeometry(2, 3),
+  // new MeshBasicMaterial({})
+  backdropMaterial
+);
+backdrop.rotation.y = Math.PI;
+// backdrop.scale.set(-1, 1, 1);
+scene.add(backdrop);
+
 const torus = new Mesh(
   // new TorusKnotBufferGeometry(0.05, 0.015, 200, 36),
-  new TorusKnotBufferGeometry(0.05, 0.015, 400, 36, 3, 2),
+  new TorusKnotBufferGeometry(0.05, 0.015, 400, 36, 4, 3),
   // new IcosahedronBufferGeometry(0.05, 10),
   material
 );
@@ -130,9 +148,10 @@ window.addEventListener("keydown", (e) => {
   if (e.code === "Space") {
     running = !running;
     if (running) {
-      speed.to(1, 500, "OutQuint");
+      const s = 1 + Math.random() * 2;
+      speed.to(s, s * 200, "OutQuint");
     } else {
-      speed.to(0, 500, "OutQuint");
+      speed.to(0, speed.value * 200, "OutQuint");
     }
   }
 });
