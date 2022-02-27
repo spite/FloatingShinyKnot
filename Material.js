@@ -62,7 +62,7 @@ in mat3 nMat;
 in vec3 vViewPosition;
 in vec3 vTangent;
 
-uniform samplerCube envMap;
+uniform sampler2D envMap;
 uniform sampler2D normalMap;
 uniform sampler2D roughnessMap;
 uniform vec3 cameraPosition;
@@ -70,6 +70,8 @@ uniform float time;
 uniform mat3 normalMatrix;
 
 out vec4 color;
+
+#define PI 3.14159265358979323846264
 
 // "p" point being textured
 // "n" surface normal at "p"
@@ -109,6 +111,12 @@ vec4 biplanar( sampler2D sam, in vec3 p, in vec3 n, in float k )
     w = pow( w, vec2(k/8.0) );
     // blend and return
     return (x*w.x + y*w.y) / (w.x + w.y);
+}
+
+vec2 vec3toUv(in vec3 dir) {
+  float yaw = .5 - atan( dir.z, - dir.x ) / ( 2.0 * PI );
+  float pitch = .5 - asin( dir.y ) / PI;
+  return vec2(yaw, 1. - pitch);
 }
 
 void main() {
@@ -157,7 +165,7 @@ void main() {
   // blended_tangent = normalize(vTangent);
                           
 
-  vec2 uv = vUv * vec2(1.,1.)+ vec2(time,0.);
+  vec2 uv = vUv * vec2(2.,1.)+ vec2(time * 2.,0.);
   float bias = 1.;
 
   float normalScale = 1.;
@@ -179,15 +187,17 @@ void main() {
   vec3 e = normalize( vViewPosition );
   float rim = 1. - pow(abs(dot(e, normalMatrix * finalNormal)), 1.);
 
-  vec4 c = texture(envMap, vNormal, 5.);
-  vec4 c1 = texture(envMap, refl, r);
-  vec4 c2 = texture(envMap, refr, 5.);
+  vec4 c = texture(envMap, vec3toUv(vNormal), 5.);
+  vec4 c1 = texture(envMap, vec3toUv(refl), r);
+  vec4 c2 = texture(envMap, vec3toUv(refr), 5.);
   color = c1;
   // color = c2;
   //mix(c, c2, .9);//c1;//
   // color = mix(c1, c2, roughness);// roughness;//vec4(1.,0.,1., 1.);
-  color = .1 * c +  c1 * vec4(vec3(rim), 1.);
+  color = .1 * c + c1 * vec4(vec3(rim), 1.);
+  // color = .5 * c + max(vec4(.5), c1 * vec4(vec3(rim), 1.));
   // color = mix(c2, c1, rim);
+  // color = c2;
 }`;
 
 const loader = new TextureLoader();
