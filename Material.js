@@ -62,12 +62,17 @@ in mat3 nMat;
 in vec3 vViewPosition;
 in vec3 vTangent;
 
-uniform sampler2D envMap;
+uniform samplerCube envMap;
 uniform sampler2D normalMap;
 uniform sampler2D roughnessMap;
 uniform vec3 cameraPosition;
 uniform float time;
 uniform mat3 normalMatrix;
+
+uniform float repeat;
+uniform float innerScatter;
+uniform float outerScatter;
+uniform float normalScale;
 
 out vec4 color;
 
@@ -165,10 +170,9 @@ void main() {
   // blended_tangent = normalize(vTangent);
                           
 
-  vec2 uv = vUv * vec2(2.,1.)+ vec2(time * 2.,0.);
+  vec2 uv = vUv * vec2(repeat,1.) + vec2(time * repeat,0.);
   float bias = 1.;
 
-  float normalScale = 1.;
   vec3 normalTex = texture(normalMap, uv, bias).rgb *2.0 - 1.0;//blendedNormal * 2.0 - 1.0;
   normalTex.xy *= normalScale;
   normalTex.y *= -1.;
@@ -187,16 +191,17 @@ void main() {
   vec3 e = normalize( vViewPosition );
   float rim = 1. - pow(abs(dot(e, normalMatrix * finalNormal)), 1.);
 
-  vec4 c = texture(envMap, vec3toUv(vNormal), 5.);
-  vec4 c1 = texture(envMap, vec3toUv(refl), r);
-  vec4 c2 = texture(envMap, vec3toUv(refr), 5.);
-  color = c1;
+  // vec4 c = texture(envMap, vNormal, 5.);
+  vec4 c1 = texture(envMap, refl, outerScatter);
+  vec4 c2 = texture(envMap, refr, innerScatter);
+  // color = c2;
+  // return;
   // color = c2;
   //mix(c, c2, .9);//c1;//
   // color = mix(c1, c2, roughness);// roughness;//vec4(1.,0.,1., 1.);
-  color = .1 * c + c1 * vec4(vec3(rim), 1.);
+  // color = .1 * c + c1 * vec4(vec3(rim), 1.);
   // color = .5 * c + max(vec4(.5), c1 * vec4(vec3(rim), 1.));
-  // color = mix(c2, c1, rim);
+  color = mix(c2, c1, rim);
   // color = c2;
 }`;
 
@@ -216,6 +221,10 @@ const material = new RawShaderMaterial({
     roughnessMap: { value: roughnessMap },
     normalMap: { value: normalMap },
     time: { value: 0 },
+    repeat: { value: 1 },
+    innerScatter: { value: 0 },
+    outerScatter: { value: 0 },
+    normalScale: { value: 1 },
   },
   // wireframe: true,
   vertexShader,
