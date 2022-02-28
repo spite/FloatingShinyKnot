@@ -12,10 +12,6 @@ import {
   TorusKnotBufferGeometry,
   DirectionalLight,
   IcosahedronBufferGeometry,
-  BoxBufferGeometry,
-  MeshBasicMaterial,
-  BackSide,
-  DoubleSide,
 } from "./third_party/three.module.js";
 import { OrbitControls } from "./third_party/OrbitControls.js";
 import { EquirectangularToCubemap } from "./EquirectangularToCubemap.js";
@@ -24,6 +20,10 @@ import { twixt } from "./twixt.js";
 import { material as backdropMaterial } from "./BackdropMaterial.js";
 
 const speed = twixt.create("speed", 1);
+const textureScale = twixt.create("scale", 1);
+const innerScatter = twixt.create("innerScatter", 0);
+const outerScatter = twixt.create("outerScatter", 0);
+const normalScale = twixt.create("normalScale", 1);
 
 const map = document.querySelector("#map-browser");
 const progress = document.querySelector("progress-bar");
@@ -73,7 +73,7 @@ async function load(lat, lng) {
   cubemap.wrapS = cubemap.wrapT = RepeatWrapping;
   cubemap.offset.set(0.5, 0);
 
-  torus.material.uniforms.envMap.value = texture;
+  torus.material.uniforms.envMap.value = cubemap;
   backdropMaterial.uniforms.envMap.value = texture;
   // backdrop.material.map = texture;
 }
@@ -142,6 +142,13 @@ function resize() {
 
 window.addEventListener("resize", resize);
 
+function randomize() {
+  textureScale.to(1 + Math.round(Math.random()) * 20, 200);
+  innerScatter.to(Math.random() * 5, 200);
+  outerScatter.to(Math.random() * 5, 200);
+  normalScale.to(Math.random() * 2, 200);
+}
+
 let running = true;
 
 window.addEventListener("keydown", (e) => {
@@ -154,6 +161,9 @@ window.addEventListener("keydown", (e) => {
       speed.to(0, speed.value * 200, "OutQuint");
     }
   }
+  if (e.code === "KeyR") {
+    randomize();
+  }
 });
 
 let time = 0;
@@ -164,6 +174,11 @@ function render() {
   const now = performance.now();
   time += (now - prevTime) * speed.value;
   prevTime = now;
+
+  material.uniforms.repeat.value = textureScale.value;
+  material.uniforms.innerScatter.value = innerScatter.value;
+  material.uniforms.outerScatter.value = outerScatter.value;
+  material.uniforms.normalScale.value = normalScale.value;
 
   // if (running) {
   const t = time / 10000;
