@@ -73,6 +73,9 @@ uniform float repeat;
 uniform float innerScatter;
 uniform float outerScatter;
 uniform float normalScale;
+uniform float reflectivity;
+uniform float roughness;
+uniform float darkness;
 
 out vec4 color;
 
@@ -170,7 +173,7 @@ void main() {
   // blended_tangent = normalize(vTangent);
                           
 
-  vec2 uv = vUv * vec2(repeat,1.) + vec2(time * repeat,0.);
+  vec2 uv = vUv * vec2(repeat,1.) + vec2(0. *time * repeat,time);
   float bias = 1.;
 
   vec3 normalTex = texture(normalMap, uv, bias).rgb *2.0 - 1.0;//blendedNormal * 2.0 - 1.0;
@@ -180,8 +183,8 @@ void main() {
   mat3 tsb = mat3( normalize( blended_tangent ) , normalize( cross( vNormal, blended_tangent ) ), normalize( vNormal ) );
   vec3 finalNormal = tsb * normalTex;
 
-  float roughness = texture(roughnessMap, uv, bias).r;
-  float r = 1.-roughness;//smoothstep(.2, .5, roughness) * 2.;
+  float r = 1. - texture(roughnessMap, uv, bias).r;
+  r = mix(1., r, roughness);
 
   vec3 fn = normalize(nMat * finalNormal);
   vec3 t = normalize(vMPosition.xyz - cameraPosition);
@@ -192,17 +195,19 @@ void main() {
   float rim = 1. - pow(abs(dot(e, normalMatrix * finalNormal)), 1.);
 
   // vec4 c = texture(envMap, vNormal, 5.);
-  vec4 c1 = texture(envMap, refl, outerScatter);
-  vec4 c2 = texture(envMap, refr, innerScatter);
+  vec4 c1 = texture(envMap, refl, r * outerScatter);
+  vec4 c2 = texture(envMap, refr, r * innerScatter);
   // color = c2;
   // return;
   // color = c2;
   //mix(c, c2, .9);//c1;//
   // color = mix(c1, c2, roughness);// roughness;//vec4(1.,0.,1., 1.);
-  // color = .1 * c + c1 * vec4(vec3(rim), 1.);
   // color = .5 * c + max(vec4(.5), c1 * vec4(vec3(rim), 1.));
-  color = mix(c2, c1, rim);
+  color = mix(mix(c2, c1, rim), c1, reflectivity);
+  color = mix(color, c1 * vec4(vec3(rim), 1.), darkness);
+
   // color = c2;
+  // color = vec4(vec3(r), 1.);
 }`;
 
 const loader = new TextureLoader();
@@ -225,6 +230,9 @@ const material = new RawShaderMaterial({
     innerScatter: { value: 0 },
     outerScatter: { value: 0 },
     normalScale: { value: 1 },
+    reflectivity: { value: 1 },
+    roughness: { value: 0 },
+    darkness: { value: 0 },
   },
   // wireframe: true,
   vertexShader,

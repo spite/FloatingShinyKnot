@@ -24,6 +24,9 @@ const textureScale = twixt.create("scale", 1);
 const innerScatter = twixt.create("innerScatter", 0);
 const outerScatter = twixt.create("outerScatter", 0);
 const normalScale = twixt.create("normalScale", 1);
+const reflectivity = twixt.create("reflectivity", 1);
+const roughness = twixt.create("roughness", 1);
+const darkness = twixt.create("darkness", 1);
 
 const map = document.querySelector("#map-browser");
 const progress = document.querySelector("progress-bar");
@@ -126,7 +129,7 @@ scene.add(backdrop);
 
 const torus = new Mesh(
   // new TorusKnotBufferGeometry(0.05, 0.015, 200, 36),
-  new TorusKnotBufferGeometry(0.05, 0.015, 400, 36, 4, 3),
+  new TorusKnotBufferGeometry(0.05, 0.015, 400, 36, 1, 3), //, 4, 3),
   // new IcosahedronBufferGeometry(0.05, 10),
   material
 );
@@ -143,10 +146,13 @@ function resize() {
 window.addEventListener("resize", resize);
 
 function randomize() {
-  textureScale.to(1 + Math.round(Math.random()) * 20, 200);
+  textureScale.to(1 + Math.round(Math.random()) * 10, 200);
   innerScatter.to(Math.random() * 5, 200);
-  outerScatter.to(Math.random() * 5, 200);
+  outerScatter.to(Math.random() * 2, 200);
   normalScale.to(Math.random() * 2, 200);
+  roughness.to(Math.random(), 200);
+  darkness.to(Math.round(Math.random()), 200);
+  reflectivity.to(Math.round(Math.random()), 200);
 }
 
 let running = true;
@@ -166,6 +172,33 @@ window.addEventListener("keydown", (e) => {
   }
 });
 
+document.querySelector("#chromeBtn").addEventListener("click", (e) => {
+  textureScale.to(1);
+  innerScatter.to(0, 200);
+  outerScatter.to(0, 200);
+  normalScale.to(0, 200);
+  reflectivity.to(1, 200);
+  roughness.to(0, 200);
+  darkness.to(0, 200);
+  e.preventDefault();
+});
+
+document.querySelector("#glassBtn").addEventListener("click", (e) => {
+  textureScale.to(1);
+  innerScatter.to(0, 200);
+  outerScatter.to(0, 200);
+  normalScale.to(0, 200);
+  reflectivity.to(0, 200);
+  roughness.to(0, 200);
+  darkness.to(0, 200);
+  e.preventDefault();
+});
+
+document.querySelector("#randomBtn").addEventListener("click", (e) => {
+  randomize();
+  e.preventDefault();
+});
+
 let time = 0;
 let prevTime = performance.now();
 
@@ -179,6 +212,9 @@ function render() {
   material.uniforms.innerScatter.value = innerScatter.value;
   material.uniforms.outerScatter.value = outerScatter.value;
   material.uniforms.normalScale.value = normalScale.value;
+  material.uniforms.reflectivity.value = reflectivity.value;
+  material.uniforms.roughness.value = roughness.value;
+  material.uniforms.darkness.value = darkness.value;
 
   // if (running) {
   const t = time / 10000;
