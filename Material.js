@@ -76,6 +76,7 @@ uniform float normalScale;
 uniform float reflectivity;
 uniform float roughness;
 uniform float darkness;
+uniform float smoothness;
 
 out vec4 color;
 
@@ -174,7 +175,7 @@ void main() {
                           
 
   vec2 uv = vUv * vec2(repeat,1.) + vec2(0. *time * repeat,time);
-  float bias = 1.;
+  float bias = smoothness;
 
   vec3 normalTex = texture(normalMap, uv, bias).rgb *2.0 - 1.0;//blendedNormal * 2.0 - 1.0;
   normalTex.xy *= normalScale;
@@ -233,6 +234,7 @@ const material = new RawShaderMaterial({
     reflectivity: { value: 1 },
     roughness: { value: 0 },
     darkness: { value: 0 },
+    smoothness: { value: 0 },
   },
   // wireframe: true,
   vertexShader,

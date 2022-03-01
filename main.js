@@ -20,13 +20,14 @@ import { twixt } from "./twixt.js";
 import { material as backdropMaterial } from "./BackdropMaterial.js";
 
 const speed = twixt.create("speed", 1);
-const textureScale = twixt.create("scale", 1);
-const innerScatter = twixt.create("innerScatter", 0);
+const textureScale = twixt.create("scale", 2);
+const innerScatter = twixt.create("innerScatter", 5);
 const outerScatter = twixt.create("outerScatter", 0);
-const normalScale = twixt.create("normalScale", 1);
-const reflectivity = twixt.create("reflectivity", 1);
+const normalScale = twixt.create("normalScale", 0.5);
+const reflectivity = twixt.create("reflectivity", 0);
 const roughness = twixt.create("roughness", 1);
-const darkness = twixt.create("darkness", 1);
+const darkness = twixt.create("darkness", 0);
+const smoothness = twixt.create("smoothness", 0);
 
 const map = document.querySelector("#map-browser");
 const progress = document.querySelector("progress-bar");
@@ -150,6 +151,7 @@ function randomize() {
   innerScatter.to(Math.random() * 5, 200);
   outerScatter.to(Math.random() * 2, 200);
   normalScale.to(Math.random() * 2, 200);
+  smoothness.to(Math.random(), 200);
   roughness.to(Math.random(), 200);
   darkness.to(Math.round(Math.random()), 200);
   reflectivity.to(Math.round(Math.random()), 200);
@@ -179,6 +181,7 @@ document.querySelector("#chromeBtn").addEventListener("click", (e) => {
   normalScale.to(0, 200);
   reflectivity.to(1, 200);
   roughness.to(0, 200);
+  smoothness.to(0, 200);
   darkness.to(0, 200);
   e.preventDefault();
 });
@@ -189,6 +192,7 @@ document.querySelector("#glassBtn").addEventListener("click", (e) => {
   outerScatter.to(0, 200);
   normalScale.to(0, 200);
   reflectivity.to(0, 200);
+  smoothness.to(0, 200);
   roughness.to(0, 200);
   darkness.to(0, 200);
   e.preventDefault();
@@ -215,6 +219,7 @@ function render() {
   material.uniforms.reflectivity.value = reflectivity.value;
   material.uniforms.roughness.value = roughness.value;
   material.uniforms.darkness.value = darkness.value;
+  material.uniforms.smoothness.value = smoothness.value;
 
   // if (running) {
   const t = time / 10000;
