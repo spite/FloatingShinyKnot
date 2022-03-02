@@ -1,7 +1,7 @@
-import "./map.js";
-import "./progress.js";
-import "./snackbar.js";
-import "./tweet-button.js";
+import "./deps/map.js";
+import "./deps/progress.js";
+import "./deps/snackbar.js";
+import "./deps/tweet-button.js";
 import { GoogleStreetViewLoader, getIdByLocation } from "./src/PanomNom.js";
 import {
   WebGLRenderer,
@@ -16,8 +16,8 @@ import {
 } from "./third_party/three.module.js";
 import { OrbitControls } from "./third_party/OrbitControls.js";
 import { EquirectangularToCubemap } from "./EquirectangularToCubemap.js";
-import { material } from "./material.js";
-import { twixt } from "./twixt.js";
+import { material } from "./Material.js";
+import { twixt } from "./deps/twixt.js";
 import { material as backdropMaterial } from "./BackdropMaterial.js";
 
 const speed = twixt.create("speed", 1);
