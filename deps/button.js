@@ -11,6 +11,7 @@ class Button extends LitElement {
     active: { type: Boolean },
     negative: { type: Boolean },
     big: { type: Boolean },
+    icon: { type: Boolean },
   };
 
   constructor() {
@@ -49,6 +50,7 @@ class Button extends LitElement {
     if (this.active) classes.push("active");
     if (this.negative) classes.push("negative");
     if (this.big) classes.push("big");
+    if (this.icon) classes.push("icon");
     return html`
       <style>
         :host {
@@ -134,8 +136,18 @@ class Button extends LitElement {
           font-size: 16px;
           padding: 7px 16px;
         }
+        .button.icon {
+          padding: 0 1em;
+          height: 2.5em;
+          display: flex;
+          align-items: center;
+          fill: #3c3c3d;
+        }
+        .button.icon:hover {
+          fill: white;
+        }
       </style>
-      <button class="button ${classes.join(" ")}"><slot></slot></button>
+      <button class="${classes.join(" ")}"><slot></slot></button>
     `;
   }
 }
