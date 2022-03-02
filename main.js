@@ -38,6 +38,8 @@ const progress = document.querySelector("progress-bar");
 const snackbar = document.querySelector("snack-bar");
 const description = document.querySelector("#description");
 
+let currentLocation;
+
 async function load(lat, lng) {
   snackbar.hide();
   progress.reset();
@@ -70,6 +72,7 @@ async function load(lat, lng) {
   window.location.hash = `${metadata.data.location.latLng.lat()},${metadata.data.location.latLng.lng()}`;
   const res = await loader.load(metadata.data.location.pano, zoom);
   description.textContent = metadata.data.location.description;
+  currentLocation = `${metadata.data.location.latLng.lat()}-${metadata.data.location.latLng.lng()}`;
 
   progress.hide();
 
@@ -161,6 +164,20 @@ function randomize() {
 
 let running = true;
 
+function capture() {
+  renderer.domElement.toBlob(function (blob) {
+    const url = URL.createObjectURL(blob);
+
+    const downloadBtn = document.createElement("a");
+    downloadBtn.setAttribute(
+      "download",
+      `fsk-${performance.now()}-${currentLocation}.png`
+    );
+    downloadBtn.setAttribute("href", url);
+    downloadBtn.click();
+  });
+}
+
 function pause() {
   running = !running;
   if (running) {
@@ -185,6 +202,11 @@ window.addEventListener("keydown", (e) => {
 
 document.querySelector("#pauseBtn").addEventListener("click", (e) => {
   pause();
+  e.preventDefault();
+});
+
+document.querySelector("#snapBtn").addEventListener("click", (e) => {
+  capture();
   e.preventDefault();
 });
 
