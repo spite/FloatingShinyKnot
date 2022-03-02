@@ -213,11 +213,11 @@ void main() {
 
 const loader = new TextureLoader();
 
-const roughnessMap = loader.load("./assets/Wavy_Water - Specular.png");
+const roughnessMap = loader.load("./assets/specular.jpg");
 roughnessMap.repeat.set(1, 1);
 roughnessMap.wrapS = roughnessMap.wrapT = RepeatWrapping;
 
-const normalMap = loader.load("./assets/Wavy_Water - Height (Normal Map).png");
+const normalMap = loader.load("./assets/normal.jpg");
 normalMap.repeat.set(1, 1);
 normalMap.wrapS = normalMap.wrapT = RepeatWrapping;
 
