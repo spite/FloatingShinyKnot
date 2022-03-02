@@ -1,6 +1,7 @@
 import "./map.js";
 import "./progress.js";
 import "./snackbar.js";
+import "./tweet-button.js";
 import { GoogleStreetViewLoader, getIdByLocation } from "./src/PanomNom.js";
 import {
   WebGLRenderer,
@@ -90,6 +91,7 @@ window.addEventListener("map-selection", async (e) => {
 
 const renderer = new WebGLRenderer({
   antialias: true,
+  preserveDrawingBuffer: true,
   powerPreference: "high-performance",
 });
 renderer.setPixelRatio(window.devicePixelRatio);
