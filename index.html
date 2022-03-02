@@ -26,14 +26,32 @@
 
     <meta name="viewport" content="initial-scale=1, maximum-scale=1" />
     <style>
+      @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500&family=Open+Sans:wght@300;600&display=swap");
+      html {
+        font-size: 14px;
+      }
+
       * {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
+        font-family: "Open Sans", sans-serif;
       }
       body {
         font-size: 13px;
         font-family: sans-serif;
+      }
+      h2,
+      h1 {
+        font-family: montserrat, sans-serif;
+      }
+      h1 {
+        margin-bottom: 0.5em;
+        font-size: 1.5rem;
+      }
+      h2 {
+        margin-bottom: 0.5em;
+        font-size: 1rem;
       }
       #map-browser {
         height: 400px;
@@ -56,20 +74,46 @@
         top: 0;
         z-index: 100;
       }
-      #tools {
+      #info {
         position: absolute;
-        left: 0;
-        top: 0;
-        padding: 1em;
+        left: 0.5em;
+        top: 0.5em;
+        pointer-events: none;
         z-index: 10;
+        padding: 1.5em;
+        color: white;
+        text-shadow: 1px 1px black;
+        border-radius: 1em;
+      }
+      #info p {
+        margin-bottom: 1em;
+      }
+      #tools {
+        pointer-events: auto;
+        display: flex;
+      }
+      x-button {
+        text-shadow: none;
       }
     </style>
   </head>
   <body>
-    <div id="tools">
-      <x-button id="chromeBtn">Pure chrome</x-button
-      ><x-button id="glassBtn">Pure glass</x-button
-      ><x-button id="randomBtn">Random</x-button>
+    <div id="info">
+      <h1>Floating Shiny Knot</h1>
+      <h2>
+        Millions of environment map textures with Google Street View panoramas
+      </h2>
+      <p>Click and drag to move the camera, scroll to zoom in and out.</br>
+        Use search box to find addresses, or click on the map to select a new
+        location.<br/>
+        Each location has a unique URL which you can share.</p>
+      <p id="tools">
+        <x-button id="chromeBtn" left>Pure chrome</x-button>
+        <x-button id="glassBtn" middle>Pure glass</x-button>
+        <x-button id="randomBtn" right>Random</x-button>
+      </p>
+      <p>Made with threejs and PanomNom.js.</p>
+      <tweet-button></tweet-button>
     </div>
     <map-browser id="map-browser"></map-browser>
     <div id="pano"></div>
