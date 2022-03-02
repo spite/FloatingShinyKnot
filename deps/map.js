@@ -9,12 +9,18 @@ const locations = [
   { lat: 28.240385123352873, lng: -16.629988706884774 },
   { lat: 50.09072314148827, lng: 14.393133454556278 },
   { lat: 41.413416092316275, lng: 2.1531126527786455 },
-  { lat: 35.69143938066447, lng: 139.695139627539 },
+  { lat: 35.71445889443406, lng: 139.7966938981724 },
   { lat: 35.67120372775569, lng: 139.77167914398797 },
   { lat: 54.552083679428065, lng: -3.297380963134742 },
 ];
 
 class MapBrowser extends LitElement {
+  static get properties() {
+    return {
+      collapsed: { type: Boolean },
+    };
+  }
+
   constructor() {
     super();
     this.marker = null;
@@ -112,9 +118,21 @@ class MapBrowser extends LitElement {
   }
 
   async onChange(e) {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${e.target.value}`;
+    await this.search(e.target.value);
+  }
+
+  async onSearch(e) {
+    const el = this.shadowRoot.querySelector("#search");
+    await this.search(el.value);
+  }
+
+  async search(str) {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${str}`;
     const res = await fetch(url, { mode: "cors" });
     const data = await res.json();
+    if (!data.length) {
+      console.log(data);
+    }
     const city = data[0];
     const bb = city.boundingbox;
     this.map.fitBounds([
@@ -147,6 +165,10 @@ class MapBrowser extends LitElement {
     return false;
   }
 
+  onCollapse() {
+    this.collapsed = !this.collapsed;
+  }
+
   render() {
     return html`
       <style>
@@ -154,30 +176,63 @@ class MapBrowser extends LitElement {
           display: block;
           position: relative;
           font: inherit;
+          overflow: hidden;
+        }
+        #container {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5em;
+          justify-content: flex-end;
+        }
+        #map-container {
+          position: relative;
+          flex: 1 1 400px;
+        }
+        #map-container.collapsed {
+          height: 0;
+          flex: 0;
         }
         #map {
           position: absolute;
           left: 0;
           top: 0;
           right: 0;
-          bottom: 4em;
+          bottom: 0;
         }
         #tools {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
           display: flex;
           flex-direction: row;
         }
+        #tools div {
+          display: flex;
+        }
+        #tools div:first-child {
+          flex: 1;
+          margin: 0 0.5em 0 0;
+        }
         input {
-          padding: 0.75em 0.5em;
+          padding: 0.5em 0.5em;
           border: 1px solid #111;
           outline: none;
           border-radius: 0.25em;
-          margin-bottom: 0.5em;
           flex: 1;
           margin-right: 0.5em;
+        }
+        .collapse-bar {
+          justify-content: flex-end;
+          display: flex;
+        }
+        @media (max-width: 600px) {
+          #tools {
+            flex-direction: column;
+          }
+          #tools div:first-child {
+            flex: 1;
+            margin: 0 0 0.5em 0;
+          }
+          #tools div:nth-child(2) {
+            justify-content: end;
+          }
         }
       </style>
       <link
@@ -186,20 +241,39 @@ class MapBrowser extends LitElement {
         integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
         crossorigin=""
       />
-      <div id="map"></div>
-      <div id="tools">
-        <input
-          placeholder="Search..."
-          type="text"
-          id="search"
-          @input=${this.onInput}
-          @change=${this.onChange}
-        />
-        <x-button class="btn" @click=${this.onLocation}>My location</x-button>
-        <x-button class="btn" @click=${this.randomLocation}>
-          Random location
-        </x-button>
-        <div></div>
+      <div id="container">
+        <div class="collapse-bar">
+          <x-button @click="${this.onCollapse}"
+            >${this.collapsed ? "Expand ▲" : "Collapse ▼"}</x-button
+          >
+        </div>
+        <div id="map-container" class="${this.collapsed ? "collapsed" : ""}">
+          <div id="map"></div>
+        </div>
+        <div id="tools">
+          <div>
+            <input
+              placeholder="Search..."
+              type="text"
+              id="search"
+              autocomplete="off"
+              @input=${this.onInput}
+              @change=${this.onChange}
+            />
+            <x-button class="btn" class="search" @click=${this.onSearch}
+              >Search</x-button
+            >
+          </div>
+          <div>
+            <x-button class="btn" left @click=${this.onLocation}
+              >My location</x-button
+            >
+            <x-button class="btn" right @click=${this.randomLocation}>
+              Random location
+            </x-button>
+          </div>
+          <div></div>
+        </div>
       </div>
     `;
   }
