@@ -37,6 +37,7 @@ const map = document.querySelector("#map-browser");
 const progress = document.querySelector("progress-bar");
 const snackbar = document.querySelector("snack-bar");
 const description = document.querySelector("#description");
+map.snackbar = snackbar;
 
 let currentLocation;
 
@@ -189,7 +190,8 @@ function pause() {
 }
 
 window.addEventListener("keydown", (e) => {
-  if (e.path[0].tagName === "INPUT") {
+  const path = e.composedPath();
+  if (path && path[0].tagName === "INPUT") {
     return;
   }
   if (e.code === "Space") {
