@@ -41,17 +41,16 @@ class ProgressBar extends LitElement {
         }
         #bar {
           width: min(1000px, calc(100% - 40px));
-          height: 40px;
-          background-color: black;
+          height: 20px;
+          background-color: white;
           border-radius: 3px;
           padding: 2px;
         }
         #progress {
-          //transition: width 100ms ease-in-out;
           width: 0;
           height: 100%;
           border-radius: 2px;
-          background-color: #808080;
+          background-color: #0f5ea2;
         }
       </style>
       <div id="bar">
