@@ -6,3 +6,8 @@ Remake of streetViewReflectionMapping/Floating Shiny Knot (https://www.designboo
 
 This version is updated to use threejs with WebGL2, custom elements, leaflet with OpenStreetMap data for the map widget, and PanomNom.js for the Street View panorama stitching. 
  
+ threejs https://threejs.org/  
+ Leaflet https://leafletjs.com/  
+ Lit https://lit.dev/  
+ Camera icon https://fonts.google.com/icons  
+ PanomNom.js https://github.com/spite/PanomNom.js (old version)
