@@ -103,12 +103,18 @@
       #tools {
         pointer-events: auto;
         display: flex;
+        flex-wrap: wrap;
+        gap: 0.5em;
+        margin-bottom: .5em;
+      }
+      #tools div {
+        display: flex;
       }
       x-button {
         text-shadow: none;
       }
       #pauseBtn {
-        margin: 0 1em
+        margin-right: .5em
       }
       #description {
         margin-top: 1em;
@@ -131,13 +137,15 @@
         Use search box to find addresses, or click on the map to select a new
         location.<br/>
         Each location has a unique URL which you can share.</p>
-      <p id="tools">
+      <div id="tools">
+        <div>
         <x-button id="chromeBtn" left>Pure chrome</x-button>
         <x-button id="glassBtn" middle>Pure glass</x-button>
         <x-button id="randomBtn" right>Random</x-button>
+      </div><div>
         <x-button id="pauseBtn">Pause</x-button>
-        <x-button id="snapBtn" icon><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M14.12 4l1.83 2H20v12H4V6h4.05l1.83-2h4.24M15 2H9L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2zm-3 7c1.65 0 3 1.35 3 3s-1.35 3-3 3-3-1.35-3-3 1.35-3 3-3m0-2c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5z"/></svg></x-button>
-      </p>
+        <x-button id="snapBtn" icon><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M14.12 4l1.83 2H20v12H4V6h4.05l1.83-2h4.24M15 2H9L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2zm-3 7c1.65 0 3 1.35 3 3s-1.35 3-3 3-3-1.35-3-3 1.35-3 3-3m0-2c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5z"/></svg></x-button></div>
+      </div>
       <p>Made with <a target="blank" href="https://threejs.org/">threejs</a> and <a target="blank" href="https://github.com/spite/PanomNom.js">PanomNom.js</a>. Find the code on <a target="blank" href="https://github.com/spite/FloatingShinyKnot/">Github</a>.</p>
       <tweet-button></tweet-button>
       <p id="description"></p>
