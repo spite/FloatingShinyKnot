@@ -2,7 +2,10 @@ import "./deps/map.js";
 import "./deps/progress.js";
 import "./deps/snackbar.js";
 import "./deps/tweet-button.js";
-import { GoogleStreetViewLoader, getIdByLocation } from "./src/PanomNom.js";
+import {
+  GoogleStreetViewLoader,
+  getIdByLocation,
+} from "./deps/PanomNom/PanomNom.js";
 import {
   WebGLRenderer,
   Scene,
@@ -33,9 +36,9 @@ const smoothness = twixt.create("smoothness", 0);
 const map = document.querySelector("#map-browser");
 const progress = document.querySelector("progress-bar");
 const snackbar = document.querySelector("snack-bar");
+const description = document.querySelector("#description");
 
 async function load(lat, lng) {
-  // progress.textContent = "Loading...";
   snackbar.hide();
   progress.reset();
   progress.show();
@@ -52,13 +55,11 @@ async function load(lat, lng) {
     metadata = await getIdByLocation(lat, lng);
   } catch (e) {
     progress.hide();
-    console.log(e);
     if (e.code === "ZERO_RESULTS") {
       snackbar.error(
         "There are no panoramas available in the selected location."
       );
     }
-    // progress.textContent = e;
     return;
   }
 
@@ -68,8 +69,8 @@ async function load(lat, lng) {
   );
   window.location.hash = `${metadata.data.location.latLng.lat()},${metadata.data.location.latLng.lng()}`;
   const res = await loader.load(metadata.data.location.pano, zoom);
+  description.textContent = metadata.data.location.description;
 
-  // progress.textContent = "Loaded.";
   progress.hide();
 
   const texture = new CanvasTexture(loader.canvas);
@@ -80,7 +81,6 @@ async function load(lat, lng) {
 
   torus.material.uniforms.envMap.value = cubemap;
   backdropMaterial.uniforms.envMap.value = texture;
-  // backdrop.material.map = texture;
 }
 
 window.addEventListener("map-selection", async (e) => {
@@ -101,7 +101,7 @@ const equiToCube = new EquirectangularToCubemap(renderer);
 
 const scene = new Scene();
 const camera = new PerspectiveCamera(75, 1, 0.001, 10);
-camera.position.set(0.1, 0.1, 0.1);
+camera.position.set(0.2, -0.1, 0).normalize().multiplyScalar(0.2);
 camera.lookAt(scene.position);
 
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -121,13 +121,10 @@ const directLight = new DirectionalLight(0xffffff);
 scene.add(directLight);
 
 const backdrop = new Mesh(
-  // new BoxBufferGeometry(10, 10, 10),
   new IcosahedronBufferGeometry(2, 3),
-  // new MeshBasicMaterial({})
   backdropMaterial
 );
 backdrop.rotation.y = Math.PI;
-// backdrop.scale.set(-1, 1, 1);
 scene.add(backdrop);
 
 const torus = new Mesh(
@@ -161,19 +158,31 @@ function randomize() {
 
 let running = true;
 
+function pause() {
+  running = !running;
+  if (running) {
+    const s = 1 + Math.random() * 2;
+    speed.to(s, s * 200, "OutQuint");
+  } else {
+    speed.to(0, speed.value * 200, "OutQuint");
+  }
+}
+
 window.addEventListener("keydown", (e) => {
+  if (e.path[0].tagName === "INPUT") {
+    return;
+  }
   if (e.code === "Space") {
-    running = !running;
-    if (running) {
-      const s = 1 + Math.random() * 2;
-      speed.to(s, s * 200, "OutQuint");
-    } else {
-      speed.to(0, speed.value * 200, "OutQuint");
-    }
+    pause();
   }
   if (e.code === "KeyR") {
     randomize();
   }
+});
+
+document.querySelector("#pauseBtn").addEventListener("click", (e) => {
+  pause();
+  e.preventDefault();
 });
 
 document.querySelector("#chromeBtn").addEventListener("click", (e) => {
@@ -223,13 +232,11 @@ function render() {
   material.uniforms.darkness.value = darkness.value;
   material.uniforms.smoothness.value = smoothness.value;
 
-  // if (running) {
   const t = time / 10000;
   torus.rotation.x = 0.49 * t;
   torus.rotation.y = 0.5 * t;
   torus.rotation.z = 0.51 * t;
   material.uniforms.time.value = t;
-  // }
 
   renderer.render(scene, camera);
   renderer.setAnimationLoop(render);
