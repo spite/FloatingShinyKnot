@@ -22,6 +22,7 @@ class MapBrowser extends LitElement {
 
   constructor() {
     super();
+    this.snackbar = null;
     this.marker = null;
     this.onReady = null;
     this.ready = new Promise((resolve, reject) => {
@@ -130,7 +131,10 @@ class MapBrowser extends LitElement {
     const res = await fetch(url, { mode: "cors" });
     const data = await res.json();
     if (!data.length) {
-      console.log(data);
+      this.snackbar.error(
+        `Could not find a result for the specified location.`
+      );
+      return;
     }
     const city = data[0];
     const bb = city.boundingbox;
@@ -147,7 +151,7 @@ class MapBrowser extends LitElement {
         this.addMarker(pos.coords.latitude, pos.coords.longitude);
       },
       (e) => {
-        debugger;
+        this.snackbar.error(`Could not acquire geolocation: ${e.message}`);
       },
       { enableHighAccuracy: true }
     );
