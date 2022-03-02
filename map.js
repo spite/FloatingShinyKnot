@@ -2,7 +2,7 @@ import { LitElement, html } from "https://unpkg.com/lit?module";
 import "./button.js";
 
 const locations = [
-  { lat: 51.50700703827454, lng: -0.12791916931155356 },
+  { lat: 51.50811493725607, lng: -0.1280283413492745 },
   { lat: 32.6144404, lng: -108.9852017 },
   { lat: 39.36382677360614, lng: 8.431220278759724 },
   { lat: 59.30571937680209, lng: 4.879402148657164 },
@@ -141,6 +141,12 @@ class MapBrowser extends LitElement {
     this.addMarker(location.lat, location.lng);
   }
 
+  onInput(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    return false;
+  }
+
   render() {
     return html`
       <style>
@@ -186,6 +192,7 @@ class MapBrowser extends LitElement {
           placeholder="Search..."
           type="text"
           id="search"
+          @input=${this.onInput}
           @change=${this.onChange}
         />
         <x-button class="btn" @click=${this.onLocation}>My location</x-button>
