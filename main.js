@@ -106,6 +106,9 @@ camera.lookAt(scene.position);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
+controls.minDistance = 0.1;
+controls.maxDistance = 1.9;
+controls.enablePan = false;
 
 const canvas = document.createElement("canvas");
 canvas.width = 512;
