@@ -45,6 +45,7 @@ class SnackBar extends LitElement {
           display: flex;
           align-items: center;
           justify-content: center;
+          pointer-events: none;
         }
         #bar {
           background-color: #808080;
@@ -56,6 +57,7 @@ class SnackBar extends LitElement {
           transition: transform 250ms ease-out;
           display: flex;
           align-items: center;
+          pointer-events: auto;
         }
         #bar.visible {
           transform: translate(0, 0);
