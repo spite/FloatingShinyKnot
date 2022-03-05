@@ -10,4 +10,4 @@ This version is updated to use threejs with WebGL2, custom elements, leaflet wit
  Leaflet https://leafletjs.com/  
  Lit https://lit.dev/  
  Camera icon https://fonts.google.com/icons  
- PanomNom.js https://github.com/spite/PanomNom.js (old version)
+ PanomNom.js https://github.com/spite/PanomNom.js 
