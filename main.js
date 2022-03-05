@@ -2,10 +2,8 @@ import "./deps/map.js";
 import "./deps/progress.js";
 import "./deps/snackbar.js";
 import "./deps/tweet-button.js";
-import {
-  GoogleStreetViewLoader,
-  getIdByLocation,
-} from "./deps/PanomNom/PanomNom.js";
+import { GoogleStreetViewLoader } from "./deps/PanomNom/GoogleStreetViewLoader.js";
+import { getIdByLocation } from "./deps/PanomNom/utils.js";
 import {
   WebGLRenderer,
   Scene,
@@ -72,7 +70,8 @@ async function load(lat, lng) {
   );
   window.location.hash = `${metadata.data.location.latLng.lat()},${metadata.data.location.latLng.lng()}`;
   const res = await loader.load(metadata.data.location.pano, zoom);
-  description.textContent = metadata.data.location.description;
+  description.textContent = `${metadata.data.location.description} 
+  ${metadata.data.copyright}`;
   currentLocation = `${metadata.data.location.latLng.lat()}-${metadata.data.location.latLng.lng()}`;
 
   progress.hide();
