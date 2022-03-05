@@ -1,9 +1,5 @@
 import { Loader } from "./Loader.js";
-import {
-  getPanoramaById,
-  getGoogleStreetViewService,
-  getIdByLocation,
-} from "./utils.js";
+import { getPanoramaById, getGoogleStreetViewService } from "./utils.js";
 
 class GoogleStreetViewLoader extends Loader {
   constructor() {
@@ -14,20 +10,12 @@ class GoogleStreetViewLoader extends Loader {
     this.metadata = {};
   }
 
-  async load(id, zoom) {
-    //console.log( 'Loading ' + id + ' ' + zoom );
-
-    if (zoom === undefined) {
-      console.warn("No zoom provided, assuming 1");
-      zoom = 1;
-    }
-
+  async load(id, zoom = 1) {
     this.zoom = zoom;
     this.panoId = id;
 
     const metadata = await getPanoramaById(id);
     this.metadata = metadata;
-    console.log(this.metadata);
 
     const aspectRatio =
       this.metadata.tiles.worldSize.width /
@@ -52,8 +40,8 @@ class GoogleStreetViewLoader extends Loader {
     const w = levels[zoom];
     const h = w / aspectRatio;
 
-    for (var y = 0; y < h; y++) {
-      for (var x = 0; x < w; x++) {
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
         const url = `https://geo0.ggpht.com/cbk?cb_client=maps_sv.tactile&authuser=0&hl=en&panoid=${id}&output=tile&x=${x}&y=${y}&zoom=${zoom}&nbt&fover=2`;
 
         this.stitcher.addTileTask({
@@ -69,4 +57,4 @@ class GoogleStreetViewLoader extends Loader {
   }
 }
 
-export { GoogleStreetViewLoader, getIdByLocation };
+export { GoogleStreetViewLoader };

@@ -1,8 +1,5 @@
-import { EventDispatcher } from "./EventDispatcher.js";
-
-class Stitcher extends EventDispatcher {
+class Stitcher {
   constructor(canvas) {
-    super();
     this.canvas = canvas;
     this.ctx = this.canvas.getContext("2d");
     this.queue = [];
@@ -22,11 +19,10 @@ class Stitcher extends EventDispatcher {
   }
 
   updateProgress() {
-    var p = (this.loaded * 100) / this.toLoad;
+    const p = (this.loaded * 100) / this.toLoad;
     if (this.onProgress) {
       this.onProgress(p);
     }
-    // this.dispatchEvent({ type: "progress", message: p });
   }
 
   processQueue() {
@@ -43,9 +39,9 @@ class Stitcher extends EventDispatcher {
     if (this.queue.length === 0) {
       return;
     }
-    var task = this.queue.shift();
+    const task = this.queue.shift();
 
-    var img = new Image();
+    let img = new Image();
     img.decoding = "async";
     img.addEventListener("load", () => {
       this.loaded++;
@@ -66,8 +62,8 @@ class Stitcher extends EventDispatcher {
       img = null;
     });
 
-    img.addEventListener("error", () => {
-      reject(false);
+    img.addEventListener("error", (e) => {
+      this.reject("NO_IMAGE");
       img = null;
     });
 
